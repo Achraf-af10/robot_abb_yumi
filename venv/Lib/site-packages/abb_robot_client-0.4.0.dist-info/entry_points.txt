@@ -1,0 +1,2 @@
+[console_scripts]
+abb-robot-client-robotraconteur = abb_robot_client.robotraconteur.abb_robotraconteur_rws_driver:main
