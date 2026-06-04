@@ -6,6 +6,7 @@ import time
 
 # Connexion unique
 robot = RWS("http://10.2.30.126")
+lock = threading.Lock()
 
 def move_joint(side, pos_list):
     joints = [float(d) for d in pos_list[:6]]
@@ -38,6 +39,31 @@ def move_linear(side, data):
     robot.set_rapid_variable(var_t, val, task=task)
     robot.set_rapid_variable(var_c, "1", task)
     print(f"MoveL {side} lancé")
+
+def move_linear_to_to(side, data):
+    x, y, z = data[0], data[1], data[2]
+    q1, q2, q3, q4 = data[3], data[4], data[5], data[6]
+    cf = [int(data[7]), int(data[8]), int(data[9]), int(data[10])] if len(data) > 7 else [0, 0, 0, 0]
+
+    task = "T_ROB_L" if side == "L" else "T_ROB_R"
+    module = "PythonCtrl" if side == "L" else "PythonCtrlR"
+    var_t = "pTargetL1" if side == "L" else "pTargetR1"
+    var_c = "cmdLinL" if side == "L" else "cmdLinR"
+
+    # Récupération de l'axe externe actuel pour ne pas le modifier
+    mech = "ROB_L" if side == "L" else "ROB_R"
+    j7 = float(robot.get_jointtarget(mechunit=mech).extax[0])
+
+    val = (f"[[{x:.3f},{y:.3f},{z:.3f}],"
+           f"[{q1:.6f},{q2:.6f},{q3:.6f},{q4:.6f}],"
+           f"[{cf[0]},{cf[1]},{cf[2]},{cf[3]}],"
+           f"[{j7:.3f},9E+09,9E+09,9E+09,9E+09,9E+09]]")
+
+    with lock:
+        robot.poll_rmmp()
+        robot.set_rapid_variable(f"{module}/{var_t}", val, task=task)
+        robot.set_rapid_variable(f"{module}/{var_c}", "1", task)
+    print(f"MoveL {side} lancé vers XYZ: {x:.1f}, {y:.1f}, {z:.1f}")
 
 def move_both_linear(data_l, data_r):
     t1 = threading.Thread(target=move_linear, args=("L", data_l))
@@ -78,40 +104,60 @@ def move_relativeRL(robot, dx, dy, dz):
     t1.join()
     t2.join()
 
+def move_linear_to(side, data):
+    x, y, z = data[0], data[1], data[2]
+    q1, q2, q3, q4 = data[3], data[4], data[5], data[6]
+    
+    task = "T_ROB_L" if side == "L" else "T_ROB_R"
+    var_t = "pTargetL1" if side == "L" else "pTargetR1"
+    var_c = "cmdLinL" if side == "L" else "cmdLinR"
+
+    val = f"[[{x:.3f},{y:.3f},{z:.3f}],[{q1:.6f},{q2:.6f},{q3:.6f},{q4:.6f}],[0,0,0,0],[0,9E9,9E9,9E9,9E9,9E9]]"
+
+    with lock:
+        robot.set_rapid_variable(var_t, val, task=task)
+        robot.set_rapid_variable(var_c, "1", task)
+
+def update_wobj(side, x, y, z):
+    """Met à jour le WObj sur le robot avec un formatage strict."""
+    task = "T_ROB_L" if side == "L" else "T_ROB_R"
+    module = "PythonCtrl" if side == "L" else "PythonCtrlR"
+    var = "mon_repere" if side == "L" else "mon_repereR"
+    
+    # Formatage strict : [robframe, objframe, name, uframe, oframe]
+    # uframe contient la position (x,y,z) et l'orientation (q1,q2,q3,q4)
+    val = f"[FALSE,TRUE,'',[[{x:.3f},{y:.3f},{z:.3f}],[1,0,0,0]],[[0,0,0],[1,0,0,0]]]"
+    
+    with lock:
+        # On utilise le format Module/Variable pour cibler précisément la PERS
+        robot.set_rapid_variable(f"{module}/{var}", val, task=task)
+    print(f"Succès : {module}/{var} mis à jour à ({x}, {y}, {z})")
+    
+
 if __name__ == "__main__":
     robot.request_rmmp(timeout=15)
 
 
-    #depart
-    closeL(robot)
-    move_both_joint([-30.92, -137.31, 43.44, 83.75, 75.81, 27.93, 112.1], [38.7, -120.73, 38.1, -59.66, 57.79, 124.54, -117.72])
+    #depar
+    """
+    move_joint("L", [-18.67, -129.04, 44.48, 60.62, 79.66, 38.6, 111.5])
+    time.sleep(10)
+    move_joint("L", [-71.34, -128.9, 51.87, 60.65, 76.96, 0.01, 54.39])
+    time.sleep(10)
+    move_joint("L", [-89.85, -53.08, 28.38, 103.18, 92.97, -54.88, 74.58])
+    time.sleep(10)
+    move_joint("L", [-99.58, -61.43, 13.96, 115.53, 84.61, -50.12, 90.38])
+    time.sleep(10)
+    move_joint("L", [-89.85, -53.08, 28.38, 103.18, 92.97, -54.88, 74.58])
+    time.sleep(10)
+    move_joint("L", [-77.38, -64.37, 61.13, 117.24, 97.05, -74.55, 81.21])
+    time.sleep(10)
+    move_joint("L", [-83.59, -71.27, 46.47, 132.6, 90.1, -68.59, 97.09])
 
-    move_joint("L",[-107.02, -109.98, 25.33, 75.85, 81.35, -23.28, 39.65])
-    
-    move_joint("L",[-116.55, -114.29, 30.93, 169.27, 118.6, -30.94, 51.15])
+    """
 
-
-
-    openL(robot)
-    time.sleep(1.5)
-    move_joint("L",[-116.52, -115.74, 25.86, 171.07, 112.93, -29.67, 51.57])
-    time.sleep(1.5)
-    closeL(robot)
-    time.sleep(1.5)
-
-    move_joint("L",[-116.74, -112.62, 34.49, 167.29, 123.22, -32.2, 50.46])
-
-    move_joint("L",[-98.74, -132.22, 54.83, 181.6, 120.6, -33.52, 71.99])
-
-
-    move_joint("L",[-98.14, -133.46, 51.22, 182.46, 116.15, -32.6, 72.15])
-    time.sleep(1)
-    openL(robot)
-    time.sleep(1)
-
-    
- 
-    #move_relativeL(robot,-200,0,-20)
+    update_wobj("L", 449.0226, 42.4695, 162.9474)
+    move_linear_to("L", [0, 0, 20, 0, 1, 0, 0])
 
 
 
