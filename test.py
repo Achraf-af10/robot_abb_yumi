@@ -139,62 +139,93 @@ def get_piece_data(i, j):
     
     return [pos[0], pos[1], pos[2], 0.0, 0.997264, 0.0739287, 0.0, 1, -1, -1, 4, -176.047]
 
+def set_wobj(side, wobj_name, xyz, quat):
+    """Définir un repère depuis Python"""
+    task   = "T_ROB_L"    if side == "L" else "T_ROB_R"
+    module = "PythonCtrl" if side == "L" else "PythonCtrlR"
+    x, y, z        = xyz
+    q1, q2, q3, q4 = quat
+    val = (f"[FALSE,TRUE,'',"
+           f"[[{x:.3f},{y:.3f},{z:.3f}],"
+           f"[{q1:.6f},{q2:.6f},{q3:.6f},{q4:.6f}]],"
+           f"[[0,0,0],[1,0,0,0]]]")
+    with lock:
+        robot.poll_rmmp()
+        robot.set_rapid_variable(f"{module}/{wobj_name}", val, task)
+    print(f"Repère {wobj_name} → [{x:.2f},{y:.2f},{z:.2f}]")
+
+def move_linear_wobj(side, wobj_cmd, data):
+    """MoveL dans un repère spécifique"""
+    x, y, z        = data[0], data[1], data[2]
+    q1, q2, q3, q4 = data[3], data[4], data[5], data[6]
+    cf = [int(data[7]), int(data[8]), int(data[9]), int(data[10])]
+    j7 = float(data[11])
+
+    task   = "T_ROB_L"    if side == "L" else "T_ROB_R"
+    module = "PythonCtrl" if side == "L" else "PythonCtrlR"
+
+    # Choisir la bonne cible selon le repère
+    if wobj_cmd == "cmdLinPriseR":
+        var_t = "pPriseR"
+    elif wobj_cmd == "cmdLinPoseR":
+        var_t = "pPoseR"
+    else:
+        var_t = "pTargetR1"
+        
+    if wobj_cmd == "cmdLinPriseL":
+        var_t = "pPriseL"
+    elif wobj_cmd == "cmdLinPoseL":
+        var_t = "pPoseL"
+    else:
+        var_t = "pTargetL1"
+
+    val = (f"[[{x:.3f},{y:.3f},{z:.3f}],"
+           f"[{q1:.6f},{q2:.6f},{q3:.6f},{q4:.6f}],"
+           f"[{cf[0]},{cf[1]},{cf[2]},{cf[3]}],"
+           f"[{j7:.3f},9E+09,9E+09,9E+09,9E+09,9E+09]]")
+
+    with lock:
+        robot.poll_rmmp()
+        robot.set_rapid_variable(f"{module}/{var_t}", val, task)
+        robot.poll_rmmp()
+        robot.set_rapid_variable(f"{module}/{wobj_cmd}", "1", task)
+
+    wait_done(wobj_cmd, task)
+    print(f"MoveL dans repère {wobj_cmd} terminé")
+
+def move_relative_wobj(side, wobj_cmd, dx, dy, dz):
+    """MoveL relatif dans un repère spécifique"""
+    task   = "T_ROB_L"    if side == "L" else "T_ROB_R"
+    module = "PythonCtrl" if side == "L" else "PythonCtrlR"
+    suffix = "R" if side == "R" else ""
+
+    with lock:
+        robot.poll_rmmp()
+        robot.set_rapid_variable(f"{module}/dx{suffix}", str(dx), task)
+        robot.set_rapid_variable(f"{module}/dy{suffix}", str(dy), task)
+        robot.set_rapid_variable(f"{module}/dz{suffix}", str(dz), task)
+        robot.set_rapid_variable(f"{module}/{wobj_cmd}", "1", task)
+
+    wait_done(wobj_cmd, task)
+    print(f"MoveRelative dans repère {wobj_cmd} terminé")
+
+
 if __name__ == "__main__":
     robot.request_rmmp(timeout=15)
     time.sleep(1)
     robot.poll_rmmp()
+
+
+
+    ###################################
+    move_linear_wobj("L","cmdLinPriseL",[0,0,0,          1,-0.0319725,-0.13666,0,-1,2,-1,4,-170.409])
+    move_linear_wobj("L","cmdLinPriseL",[0,0,-100,       1,-0.0319725,-0.13666,0,-1,2,-1,4,-170.409])
+    openL()
+    closeL()
+
     
-    closeR()
-    set_speedR(100)
-
-    # Parcours de la grille 5x2
-    for i in range(3):
-        for j in range(0):
-            # 1. Aller à la position de sécurité
-            move_joint("R", [101.01, -62.22, 55.08, -124.95, 101.36, -89.4, -86.13])
-            
-            # 2. Récupérer les coordonnées de la pièce actuelle
-            piece_pos = get_piece_data(i, j)
-            
-            # 3. Approche (50mm au-dessus)
-            approche = list(piece_pos)
-            approche[2] += 50
-            move_linear_to("R", approche)
-            
-            # 4. Prise
-            set_speedR(10)
-            move_linear_to("R", piece_pos)
-            closeR()
-            
-            # 5. Remontée
-            move_linear_to("R", approche)
-            
-            # 6. Déplacement vers zone de pose
-            set_speedR(100)
-            move_linear_to("R", [319.80, 34.70, 97.58, 0, 0.997263, 0.0739298, 0, 1, -2, -1, 4, -176.048])
-            
-            # 7. Pose
-            set_speedR(10)
-            move_linear_to("R", [319.80, 34.70, 84.25, 0, 0.997263, 0.0739293, 0, 1, -2, -1, 4, -176.048])
-            
-            openR()
-            
-            # 8. Retour sécurité
-            set_speedR(100)
-            move_linear_to("R", [319.80, 34.70, 97.58, 0, 0.997263, 0.0739298, 0, 1, -2, -1, 4, -176.048])
-
-    # Retour final
-    move_joint("R", [101.01, -62.22, 55.08, -124.95, 101.36, -89.4, -86.13])
 
 """
-if __name__ == "__main__":
-    robot.request_rmmp(timeout=15)
-    time.sleep(1)
-    robot.poll_rmmp()
-    closeR()
-    set_speedR(100)
-    move_joint("R",[101.01, -62.22, 55.08, -124.95, 101.36, -89.4, -86.13])
-
     move_joint("R",[106.81, -53.02, 24.38, -115.36, 88.77, -110.84, -82.26])
     openR()
 
@@ -243,8 +274,57 @@ if __name__ == "__main__":
     set_speed("L", 10)
     move_joint("L", [-83.59, -71.27, 46.47, 132.6, 90.1, -68.59, 97.09])
     openL()
+"""
+"""
+if __name__ == "__main__":
+    robot.request_rmmp(timeout=15)
+    time.sleep(1)
+    robot.poll_rmmp()
+    
+    closeR()
+    set_speedR(100)
 
+    # Parcours de la grille 5x2
+    for i in range(3):
+        for j in range(0):
+            # 1. Aller à la position de sécurité
+            move_joint("R", [101.01, -62.22, 55.08, -124.95, 101.36, -89.4, -86.13])
+            
+            # 2. Récupérer les coordonnées de la pièce actuelle
+            piece_pos = get_piece_data(i, j)
+            
+            # 3. Approche (50mm au-dessus)
+            approche = list(piece_pos)
+            approche[2] += 50
+            move_linear_to("R", approche)
+            
+            # 4. Prise
+            set_speedR(10)
+            move_linear_to("R", piece_pos)
+            closeR()
+            
+            # 5. Remontée
+            move_linear_to("R", approche)
+            
+            # 6. Déplacement vers zone de pose
+            set_speedR(100)
+            move_linear_to("R", [319.80, 34.70, 97.58, 0, 0.997263, 0.0739298, 0, 1, -2, -1, 4, -176.048])
+            
+            # 7. Pose
+            set_speedR(10)
+            move_linear_to("R", [319.80, 34.70, 84.25, 0, 0.997263, 0.0739293, 0, 1, -2, -1, 4, -176.048])
+            
+            openR()
+            
+            # 8. Retour sécurité
+            set_speedR(100)
+            move_linear_to("R", [319.80, 34.70, 97.58, 0, 0.997263, 0.0739298, 0, 1, -2, -1, 4, -176.048])
 
+    # Retour final
+    move_joint("R", [101.01, -62.22, 55.08, -124.95, 101.36, -89.4, -86.13])
+"""
+
+"""
 
         [462.86,32.40,75.29],[3.23502E-05,0.997264,0.073927,1.08797E-05],[1,-1,-1,4],[-176.045,9E+09,9E+09,9E+09,9E+09,9E+09] point avant prise
     [462.86,32.41,157.53],[2.68911E-05,0.997263,0.0739327,1.45969E-05],[1,-1,-1,4],[-176.046,9E+09,9E+09,9E+09,9E+09,9E+09] point approche
@@ -290,4 +370,70 @@ ROB_R: [80.47, -62.72, 52.49, 46.42, -81.53, 94.37, -87.14]
 xy
         MoveL [[461.18,-32.41,64.09],[3.50128E-05,0.997263,0.0739301,6.18691E-06],[1,-1,-1,4],[-176.052,9E+09,9E+09,9E+09,9E+09,9E+09]], v1000, z50, tPince3D;
         MoveL [[446.03,31.35,60.20],[1.68502E-05,-0.997263,-0.0739346,0.000130543],[1,-1,-1,4],[-176.066,9E+09,9E+09,9E+09,9E+09,9E+09]], v1000, z50, tPince3D;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            set_speedR(50)
+    move_joint("R",[17.71, -94.2, 48.93, -150.95, 22.07, -131.84, -72.22])
+    set_speedR(50)
+    move_linear_wobj("R","cmdLinPriseR",[0,0,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    openR()
+    move_linear_wobj("R","cmdLinPriseR",[0,0,0,1,0,0,0,1,-2,-2,4,-139.106])
+    closeR()
+    move_linear_wobj("R","cmdLinPriseR",[0,0,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    move_linear_wobj("R","cmdLinPriseR",[-140,-15,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    move_linear_wobj("R","cmdLinPoseR",[0,0,-50,1,0,0,0,1,-2,-2,4,-139.106])
+    set_speedR(5)
+    move_linear_wobj("R","cmdLinPoseR",[0,0,0,1,0,0,0,1,-2,-2,4,-139.106])
+    openR()
+    set_speedR(50)
+    move_linear_wobj("R","cmdLinPoseR",[0,0,-80,1,0,0,0,1,-2,-2,4,-139.106])
+    closeR()
+
+    move_linear_wobj("R","cmdLinPriseR",[-3.01,29.65,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    openR()
+    move_linear_wobj("R","cmdLinPriseR",[-3.01,29.65,0,1,0,0,0,1,-2,-2,4,-139.106])
+    closeR()
+    move_linear_wobj("R","cmdLinPriseR",[-3.01,29.65,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    move_linear_wobj("R","cmdLinPriseR",[-140,-15,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    move_linear_wobj("R","cmdLinPoseR",[-3.01,29.65,-50,1,0,0,0,1,-2,-2,4,-139.106])
+    set_speedR(5)
+    move_linear_wobj("R","cmdLinPoseR",[-3.01,29.65,0,1,0,0,0,1,-2,-2,4,-139.106])
+    openR()
+    set_speedR(50)
+    move_linear_wobj("R","cmdLinPoseR",[-3.01,29.65,-80,1,0,0,0,1,-2,-2,4,-139.106])
+    closeR()
+
+
+    move_linear_wobj("R","cmdLinPriseR",[-6.80,61.41,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    openR()
+    set_speedR(5)
+    move_linear_wobj("R","cmdLinPriseR",[-6.80,61.41,3,1,0,0,0,1,-2,-2,4,-139.106])
+    closeR()
+    move_linear_wobj("R","cmdLinPriseR",[-6.80,61.41,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    set_speedR(50)
+    move_linear_wobj("R","cmdLinPriseR",[-140,-15,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    move_linear_wobj("R","cmdLinPoseR",[0,0,-50,1,0,0,0,1,-2,-2,4,-139.106])
+    set_speedR(5)
+    move_linear_wobj("R","cmdLinPoseR",[0,0,0,1,0,0,0,1,-2,-2,4,-139.106])
+    openR()
+    set_speedR(50)
+    move_linear_wobj("R","cmdLinPoseR",[0,0,-80,1,0,0,0,1,-2,-2,4,-139.106])
+    closeR()
     """
