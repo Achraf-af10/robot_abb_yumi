@@ -269,9 +269,6 @@ if __name__ == "__main__":
     move_linear_wobj("R","cmdLinPriseR",[-3.01,29.65,0,1,0,0,0,1,-2,-2,4,-139.106])
     closeR()
     move_linear_wobj("R","cmdLinPriseR",[-3.01,29.65,-100,1,0,0,0,1,-2,-2,4,-139.106])
-    handover_R_to_L()
-    move_linear_wobj("R","cmdLinPriseR",[-143,14,-100,1,0,0,0,1,-2,-2,4,-139.106])
-
     
     
 
