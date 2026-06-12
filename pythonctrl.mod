@@ -13,7 +13,7 @@ MODULE PythonCtrl
                                   [-1,1,-1,4],[90.38,9E9,9E9,9E9,9E9,9E9]];
     PERS robtarget pPriseL   := [[0,0,0],[1,0,0,0],
                                   [-1,2,-1,4],[175.56,9E+09,9E+09,9E+09,9E+09,9E+09]];
-    PERS robtarget pPoseL    := [[-28.52,5.11,-100],[1,0,0,0],
+    PERS robtarget pPoseL    := [[-54.85,-64.1,-100],[1,0,0,0],
                                   [-1,2,-1,4],[175.56,9E+09,9E+09,9E+09,9E+09,9E+09]];
     PERS jointtarget jTarget := [[-54.98,-73.65,15.08,186.68,-66.4,-116.93],
                                   [82.62,5.15662E+11,5.15662E+11,5.15662E+11,5.15662E+11,5.15662E+11]];
@@ -39,7 +39,7 @@ MODULE PythonCtrl
     PERS num dy           := 0;
     PERS num dz           := -50;
     PERS num cmdRel       := 0;
-    PERS num speedVal     := 50;
+    PERS num speedVal     := 100;
     PERS num cmdLinPriseL := 0;
     PERS num cmdLinPoseL  := 0;
     PERS num cmdRelPriseL := 0;
@@ -121,8 +121,8 @@ MODULE PythonCtrl
     PROC Receive_L()
         ! 1. Ouvrir pince et aller au point de rencontre
         g_GripOut;
-        MoveL Offs(pMeetL, 0, 50, 0), v20, fine, tPince3D;
-        WaitTime 1;
+        MoveL Offs(pMeetL, 0, 50, 0), v30, fine, tPince3D;
+        WaitTime 0.5;
         MoveJ pMeetL, v50, fine, tPince3D;
 
         ! 2. Signaler que L est en position
