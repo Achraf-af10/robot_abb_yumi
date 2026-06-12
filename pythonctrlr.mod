@@ -14,9 +14,9 @@ MODULE PythonCtrlR
 
     PERS robtarget pTargetR1  := [[0,0,0],[1,0,0,0],
                                    [-1,2,-1,4],[175.552,9E+09,9E+09,9E+09,9E+09,9E+09]];
-    PERS robtarget pPriseR    := [[-3.01,29.65,-100],[1,0,0,0],
+    PERS robtarget pPriseR    := [[0,0,-100],[1,0,0,0],
                                    [1,-2,-2,4],[-139.106,9E+09,9E+09,9E+09,9E+09,9E+09]];
-    PERS robtarget pPoseR     := [[0,0,-100],[1,0,0,0],
+    PERS robtarget pPoseR     := [[9.03,63.49,-2.74],[1,0,0,0],
                                    [1,-2,-2,4],[-139.106,9E+09,9E+09,9E+09,9E+09,9E+09]];
     PERS jointtarget jTargetR := [[113.3,-84.39,31.66,-138.56,115.91,-123.07],
                                    [-66.23,5.15662E+11,5.15662E+11,5.15662E+11,5.15662E+11,5.15662E+11]];
@@ -40,7 +40,7 @@ MODULE PythonCtrlR
     PERS num dyR          := 0;
     PERS num dzR          := 0;
     PERS num cmdRelR      := 0;
-    PERS num speedValR    := 50;
+    PERS num speedValR    := 100;
     PERS num cmdLinPriseR := 0;
     PERS num cmdLinPoseR  := 0;
     PERS num cmdRelPriseR := 0;

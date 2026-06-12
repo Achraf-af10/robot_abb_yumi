@@ -240,16 +240,16 @@ if __name__ == "__main__":
     openR()
     closeL()
     closeR()
-    set_speed("L",50)
-    set_speed("R",50)
+    set_speed("L",100)
+    set_speed("R",100)
     #move_both_joint([-52.55, -101.17, 59.65, 142.13, 93.42, -37.2, 54.89],[48.85, -113.61, 61.45, -130.59, 92.18, -156.46, -58.95])
     move_both_joint([-54.98, -73.65, 15.08, 186.68, -66.4, -116.93, 82.62],[48.85, -113.61, 61.45, -130.59, 92.18, -156.46, -58.95])
 
-    # r to app prise
+    # r to app prise 1
     move_joint("R",[113.3, -84.39, 31.66, -138.56, 115.91, -123.07, -66.23])
     openR()
     
-    # r prise
+    # r prise 1
     move_linear_wobj("R","cmdLinPriseR",[0,0,0,1,0,0,0,1,-2,-2,4,-139.106])
     closeR()
     move_linear_wobj("R","cmdLinPriseR",[0,0,-100,1,0,0,0,1,-2,-2,4,-139.106])
@@ -263,13 +263,152 @@ if __name__ == "__main__":
 
 
     #r to app prise 2
-    move_joint("R",[113.3, -84.39, 31.66, -138.56, 115.91, -123.07, -66.23])
+    move_joint("R",[108.35, -85.17, 34.26, -137.19, 115.23, -125.82, -63.23])
     move_linear_wobj("R","cmdLinPriseR",[-3.01,29.65,-100,1,0,0,0,1,-2,-2,4,-139.106])
     openR()
     move_linear_wobj("R","cmdLinPriseR",[-3.01,29.65,0,1,0,0,0,1,-2,-2,4,-139.106])
     closeR()
     move_linear_wobj("R","cmdLinPriseR",[-3.01,29.65,-100,1,0,0,0,1,-2,-2,4,-139.106])
+
+
+    #r to pose 2
+    move_joint("R",[102.0, -98.03, 62.63, -147.59, 127.76, -110.61, -78.8])
+    move_linear_wobj("R","cmdLinPoseR",[-1.51,13.79,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    move_linear_wobj("R","cmdLinPoseR",[-1.36,14.37,-2.74,1,0,0,0,1,-2,-2,4,-139.106])
+    openR()
+
+    # r to app prise 3
+    move_joint("R", [103.0, -86.34, 36.61, -135.66, 114.21, -129.21, -59.89])
+    openR()
     
+    # r prise 3
+    move_linear_wobj("R","cmdLinPriseR",[-7.07,62.49,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    move_linear_wobj("R","cmdLinPriseR",[-7.07,62.49,0,1,0,0,0,1,-2,-2,4,-139.106])
+    closeR()
+    move_linear_wobj("R","cmdLinPriseR",[-7.07,62.49,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    handover_R_to_L()
+    move_joint("L",[-80.25, -62.76, 53.39, 132.7, 93.92, -91.16, 66.82])
+    move_linear_wobj("L","cmdLinPoseL",[-27.53,-28.25,-100,1,0,0,0,-1,2,-1,4,175.56])
+    move_linear_wobj("L","cmdLinPoseL",[0.85,-33.33,0,1,0,0,0,-1,2,-1,4,175.56])
+    openL()
+    move_linear_wobj("L","cmdLinPoseL",[-27.53,-28.25,-100,1,0,0,0,-1,2,-1,4,175.56])
+    move_joint("L",[-54.98, -73.65, 15.08, 186.68, -66.4, -116.93, 82.62])
+
+
+    #r to app prise 4
+    move_joint("R",[113.3, -84.39, 31.66, -138.56, 115.91, -123.07, -66.23])
+    move_linear_wobj("R","cmdLinPriseR",[0,0,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    openR()
+    move_linear_wobj("R","cmdLinPriseR",[0,0,0,1,0,0,0,1,-2,-2,4,-139.106])
+    closeR()
+    move_linear_wobj("R","cmdLinPriseR",[0,0,-100,1,0,0,0,1,-2,-2,4,-139.106])
+
+
+    #r to pose 4
+    move_linear_wobj("R","cmdLinPoseR",[-4.94,47.74,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    move_linear_wobj("R","cmdLinPoseR",[-4.94,47.74,-2.74,1,0,0,0,1,-2,-2,4,-139.106])
+    openR()
+    move_linear_wobj("R","cmdLinPoseR",[-4.94,47.74,-100,1,0,0,0,1,-2,-2,4,-139.106])
+
+    # r to app prise 5
+    move_joint("R", [108.35, -85.17, 34.26, -137.19, 115.23, -125.82, -63.23])
+    openR()
+    
+    # r prise 5
+    move_linear_wobj("R","cmdLinPriseR",[-3.01,29.65,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    move_linear_wobj("R","cmdLinPriseR",[-3.01,29.65,0,1,0,0,0,1,-2,-2,4,-139.106])
+    closeR()
+    move_linear_wobj("R","cmdLinPriseR",[-3.01,29.65,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    handover_R_to_L()
+    move_joint("L",[-80.25, -62.76, 53.39, 132.7, 93.92, -91.16, 66.82])
+    move_linear_wobj("L","cmdLinPoseL",[-23.80,-80.08,-100,1,0,0,0,-1,2,-1,4,175.56])
+    move_linear_wobj("L","cmdLinPoseL",[3.71,-68.41,0,1,0,0,0,-1,2,-1,4,175.56])
+    openL()
+    move_linear_wobj("L","cmdLinPoseL",[-23.80,-80.08,-100,1,0,0,0,-1,2,-1,4,175.56])
+    move_joint("L",[-54.98, -73.65, 15.08, 186.68, -66.4, -116.93, 82.62])
+
+
+    #r to app prise 6
+    move_joint("R",[103.0, -86.34, 36.61, -135.66, 114.21, -129.21, -59.89])
+    move_linear_wobj("R","cmdLinPriseR",[-7.07,62.49,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    openR()
+    move_linear_wobj("R","cmdLinPriseR",[-7.07,62.49,0,1,0,0,0,1,-2,-2,4,-139.106])
+    closeR()
+    move_linear_wobj("R","cmdLinPriseR",[-7.07,62.49,-100,1,0,0,0,1,-2,-2,4,-139.106])
+
+
+    #r to pose 6
+    move_linear_wobj("R","cmdLinPoseR",[16.14,0.6,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    move_linear_wobj("R","cmdLinPoseR",[16.14,0.6,-2.74,1,0,0,0,1,-2,-2,4,-139.106])
+    openR()
+    move_linear_wobj("R","cmdLinPoseR",[16.14,0.6,-100,1,0,0,0,1,-2,-2,4,-139.106])
+
+
+    # r to app prise 7
+    move_joint("R", [113.3, -84.39, 31.66, -138.56, 115.91, -123.07, -66.23])
+    openR()
+    
+    # r prise 7
+    move_linear_wobj("R","cmdLinPriseR",[0,0,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    move_linear_wobj("R","cmdLinPriseR",[0,0,0,1,0,0,0,1,-2,-2,4,-139.106])
+    closeR()
+    move_linear_wobj("R","cmdLinPriseR",[0,0,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    handover_R_to_L()
+    move_joint("L",[-80.25, -62.76, 53.39, 132.7, 93.92, -91.16, 66.82])
+    move_linear_wobj("L","cmdLinPoseL",[-44.62,-10.61,-100,1,0,0,0,-1,2,-1,4,175.56])
+    move_linear_wobj("L","cmdLinPoseL",[-16.24,-15.68,0,1,0,0,0,-1,2,-1,4,175.56])
+    openL()
+    move_linear_wobj("L","cmdLinPoseL",[-44.62,-10.61,-100,1,0,0,0,-1,2,-1,4,175.56])
+    move_joint("L",[-54.98, -73.65, 15.08, 186.68, -66.4, -116.93, 82.62])
+
+
+    #r to app prise 8
+    move_joint("R",[108.35, -85.17, 34.26, -137.19, 115.23, -125.82, -63.23])
+    move_linear_wobj("R","cmdLinPriseR",[-3.01,29.65,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    openR()
+    move_linear_wobj("R","cmdLinPriseR",[-3.01,29.65,0,1,0,0,0,1,-2,-2,4,-139.106])
+    closeR()
+    move_linear_wobj("R","cmdLinPriseR",[-3.01,29.65,-100,1,0,0,0,1,-2,-2,4,-139.106])
+
+
+    #r to pose 8
+    move_linear_wobj("R","cmdLinPoseR",[12.61,32.04,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    move_linear_wobj("R","cmdLinPoseR",[12.61,32.04,-2.74,1,0,0,0,1,-2,-2,4,-139.106])
+    openR()
+    move_linear_wobj("R","cmdLinPoseR",[12.61,32.04,-100,1,0,0,0,1,-2,-2,4,-139.106])
+
+
+    # r to app prise 9
+    move_joint("R", [103.0, -86.34, 36.61, -135.66, 114.21, -129.21, -59.89])
+    openR()
+    
+    # r prise 9
+    move_linear_wobj("R","cmdLinPriseR",[-7.07,62.49,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    move_linear_wobj("R","cmdLinPriseR",[-7.07,62.49,0,1,0,0,0,1,-2,-2,4,-139.106])
+    closeR()
+    move_linear_wobj("R","cmdLinPriseR",[-7.07,62.49,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    handover_R_to_L()
+    move_joint("L",[-80.25, -62.76, 53.39, 132.7, 93.92, -91.16, 66.82])
+    move_linear_wobj("L","cmdLinPoseL",[-54.85,-64.10,-100,1,0,0,0,-1,2,-1,4,175.56])
+    move_linear_wobj("L","cmdLinPoseL",[-13.30,-51.38,0,1,0,0,0,-1,2,-1,4,175.56])
+    openL()
+    move_linear_wobj("L","cmdLinPoseL",[-54.85,-64.10,-100,1,0,0,0,-1,2,-1,4,175.56])
+    move_joint("L",[-54.98, -73.65, 15.08, 186.68, -66.4, -116.93, 82.62])
+
+    #r to app prise 10
+    move_joint("R",[113.3, -84.39, 31.66, -138.56, 115.91, -123.07, -66.23])
+    move_linear_wobj("R","cmdLinPriseR",[0,0,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    openR()
+    move_linear_wobj("R","cmdLinPriseR",[0,0,0,1,0,0,0,1,-2,-2,4,-139.106])
+    closeR()
+    move_linear_wobj("R","cmdLinPriseR",[0,0,-100,1,0,0,0,1,-2,-2,4,-139.106])
+
+
+    #r to pose 10
+    move_linear_wobj("R","cmdLinPoseR",[9.46,65.23,-100,1,0,0,0,1,-2,-2,4,-139.106])
+    move_linear_wobj("R","cmdLinPoseR",[9.46,65.23,-2.74,1,0,0,0,1,-2,-2,4,-139.106])
+    openR()
+    move_linear_wobj("R","cmdLinPoseR",[9.46,65.23,-100,1,0,0,0,1,-2,-2,4,-139.106])
     
 
 
